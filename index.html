@@ -2,8 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zona Gamer PRO</title>
+<title>Zona Gamer</title>
 
 <style>
 body {margin:0;font-family:sans-serif;background:#0f172a;color:white;}
@@ -11,12 +10,8 @@ header {text-align:center;padding:15px;color:#38bdf8;}
 nav {display:flex;justify-content:center;gap:20px;background:#020617;padding:10px;}
 section {display:none;padding:20px;}
 .active {display:block;}
-.card {background:#1e293b;margin:10px;border-radius:10px;cursor:pointer;}
-.card img {width:100%;height:150px;object-fit:cover;}
 button {margin-top:10px;padding:10px;border:none;border-radius:10px;cursor:pointer;}
-.like {background:#38bdf8;}
-.delete {background:red;color:white;margin-left:10px;}
-input {width:100%;padding:10px;border-radius:10px;border:none;margin-top:10px;}
+input {width:100%;padding:10px;margin-top:10px;}
 </style>
 
 <script>
@@ -25,80 +20,45 @@ function mostrar(id){
     document.getElementById(id).classList.add("active");
 }
 
-// LIKE
-function like(id){
-    let liked = localStorage.getItem("liked-"+id);
-    let count = parseInt(localStorage.getItem("likes-"+id)) || 0;
-
-    if(liked){
-        count--;
-        localStorage.removeItem("liked-"+id);
+// LIKE simple (toggle)
+function like(btn){
+    if(btn.classList.contains("activeLike")){
+        btn.classList.remove("activeLike");
+        btn.innerText = "❤️ 0";
     } else {
-        count++;
-        localStorage.setItem("liked-"+id,true);
+        btn.classList.add("activeLike");
+        btn.innerText = "❤️ 1";
     }
-
-    localStorage.setItem("likes-"+id,count);
-    actualizarLikes();
-}
-
-// ACTUALIZAR LIKES
-function actualizarLikes(){
-    ["minecraft","gta","fortnite","cod"].forEach(id=>{
-        let count = localStorage.getItem("likes-"+id) || 0;
-        document.getElementById("like-"+id).innerText = "❤️ " + count;
-    });
 }
 
 // COMENTAR
 function comentar(id){
     let input = document.getElementById("input-"+id);
-    if(input.value === "") return;
-
-    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
-    data.push(input.value);
-    localStorage.setItem("coment-"+id, JSON.stringify(data));
-    input.value = "";
-
-    cargarComentarios(id);
-}
-
-// BORRAR
-function borrar(id,index){
-    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
-    data.splice(index,1);
-    localStorage.setItem("coment-"+id, JSON.stringify(data));
-    cargarComentarios(id);
-}
-
-// CARGAR COMENTARIOS
-function cargarComentarios(id){
     let lista = document.getElementById("comentarios-"+id);
-    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
 
-    lista.innerHTML = "";
-    data.forEach((c,i)=>{
+    if(input.value !== ""){
         let li = document.createElement("li");
-        li.innerHTML = c + ' <button class="delete" onclick="borrar(\''+id+'\','+i+')">X</button>';
+
+        let texto = document.createElement("span");
+        texto.textContent = input.value;
+
+        let btn = document.createElement("button");
+        btn.textContent = "X";
+        btn.onclick = function(){ li.remove(); };
+
+        li.appendChild(texto);
+        li.appendChild(btn);
         lista.appendChild(li);
-    });
-}
 
-// INICIO
-function iniciar(){
-    actualizarLikes();
-    ["minecraft","gta","fortnite","cod"].forEach(id=>{
-        cargarComentarios(id);
-    });
+        input.value = "";
+    }
 }
-
-window.onload = iniciar;
 </script>
 
 </head>
 <body>
 
-<header>Zona Gamer PRO 🎮</header>
+<header>Zona Gamer 🎮</header>
 
 <nav>
 <a onclick="mostrar('inicio')">Inicio</a>
@@ -109,84 +69,56 @@ window.onload = iniciar;
 </nav>
 
 <section id="inicio" class="active">
-<h2>Explora juegos</h2>
-
-<div class="card" onclick="mostrar('minecraft')">
-<img src="https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png">
-<h3>Minecraft</h3>
-</div>
-
-<div class="card" onclick="mostrar('gta')">
-<img src="https://upload.wikimedia.org/wikipedia/en/a/a5/Grand_Theft_Auto_V.png">
-<h3>GTA V</h3>
-</div>
-
-<div class="card" onclick="mostrar('fortnite')">
-<img src="https://upload.wikimedia.org/wikipedia/en/0/09/Fortnite_cover.jpg">
-<h3>Fortnite</h3>
-</div>
-
-<div class="card" onclick="mostrar('cod')">
-<img src="https://upload.wikimedia.org/wikipedia/en/6/65/Call_of_Duty_Modern_Warfare_II_Key_Art.jpg">
-<h3>Call of Duty</h3>
-</div>
+<h2>Elegí un juego</h2>
+<button onclick="mostrar('minecraft')">Minecraft</button>
+<button onclick="mostrar('gta')">GTA V</button>
+<button onclick="mostrar('fortnite')">Fortnite</button>
+<button onclick="mostrar('cod')">Call of Duty</button>
 </section>
 
-<!-- MINECRAFT -->
 <section id="minecraft">
 <h2>Minecraft</h2>
 <img src="https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png" width="100%">
+<button onclick="like(this)">❤️ 0</button>
 
-<button id="like-minecraft" class="like" onclick="like('minecraft')">❤️ 0</button>
-
-<h3>Comentarios</h3>
 <input id="input-minecraft">
-<button onclick="comentar('minecraft')">Enviar</button>
+<button onclick="comentar('minecraft')">Comentar</button>
 <ul id="comentarios-minecraft"></ul>
 
 <button onclick="mostrar('inicio')">Volver</button>
 </section>
 
-<!-- GTA -->
 <section id="gta">
 <h2>GTA V</h2>
 <img src="https://upload.wikimedia.org/wikipedia/en/a/a5/Grand_Theft_Auto_V.png" width="100%">
+<button onclick="like(this)">❤️ 0</button>
 
-<button id="like-gta" class="like" onclick="like('gta')">❤️ 0</button>
-
-<h3>Comentarios</h3>
 <input id="input-gta">
-<button onclick="comentar('gta')">Enviar</button>
+<button onclick="comentar('gta')">Comentar</button>
 <ul id="comentarios-gta"></ul>
 
 <button onclick="mostrar('inicio')">Volver</button>
 </section>
 
-<!-- FORTNITE -->
 <section id="fortnite">
 <h2>Fortnite</h2>
 <img src="https://upload.wikimedia.org/wikipedia/en/0/09/Fortnite_cover.jpg" width="100%">
+<button onclick="like(this)">❤️ 0</button>
 
-<button id="like-fortnite" class="like" onclick="like('fortnite')">❤️ 0</button>
-
-<h3>Comentarios</h3>
 <input id="input-fortnite">
-<button onclick="comentar('fortnite')">Enviar</button>
+<button onclick="comentar('fortnite')">Comentar</button>
 <ul id="comentarios-fortnite"></ul>
 
 <button onclick="mostrar('inicio')">Volver</button>
 </section>
 
-<!-- COD -->
 <section id="cod">
 <h2>Call of Duty</h2>
 <img src="https://upload.wikimedia.org/wikipedia/en/6/65/Call_of_Duty_Modern_Warfare_II_Key_Art.jpg" width="100%">
+<button onclick="like(this)">❤️ 0</button>
 
-<button id="like-cod" class="like" onclick="like('cod')">❤️ 0</button>
-
-<h3>Comentarios</h3>
 <input id="input-cod">
-<button onclick="comentar('cod')">Enviar</button>
+<button onclick="comentar('cod')">Comentar</button>
 <ul id="comentarios-cod"></ul>
 
 <button onclick="mostrar('inicio')">Volver</button>
