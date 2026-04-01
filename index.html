@@ -6,65 +6,17 @@
 <title>Zona Gamer PRO</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #0f172a, #020617);
-    color: white;
-}
-
-header {
-    background: rgba(30,41,59,0.8);
-    padding: 15px;
-    text-align: center;
-    color: #38bdf8;
-}
-
-nav {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    background: #020617;
-    padding: 10px;
-}
-
-section { display: none; padding: 20px; }
-.active { display: block; }
-
-.card {
-    background: #1e293b;
-    border-radius: 15px;
-    margin: 15px 0;
-    cursor: pointer;
-    overflow: hidden;
-}
-
-.card img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-}
-
-.card-content { padding: 15px; }
-
-button {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-}
-
-.like { background: #38bdf8; }
-.delete { background: red; color: white; margin-left: 10px; }
-
-input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    margin-top: 10px;
-}
+body {margin:0;font-family:sans-serif;background:#0f172a;color:white;}
+header {text-align:center;padding:15px;color:#38bdf8;}
+nav {display:flex;justify-content:center;gap:20px;background:#020617;padding:10px;}
+section {display:none;padding:20px;}
+.active {display:block;}
+.card {background:#1e293b;margin:10px;border-radius:10px;cursor:pointer;}
+.card img {width:100%;height:150px;object-fit:cover;}
+button {margin-top:10px;padding:10px;border:none;border-radius:10px;cursor:pointer;}
+.like {background:#38bdf8;}
+.delete {background:red;color:white;margin-left:10px;}
+input {width:100%;padding:10px;border-radius:10px;border:none;margin-top:10px;}
 </style>
 
 <script>
@@ -73,72 +25,74 @@ function mostrar(id){
     document.getElementById(id).classList.add("active");
 }
 
-// LIKES (guardados)
-function like(btn, id){
-    let liked = localStorage.getItem("like-"+id);
-    let count = parseInt(localStorage.getItem("count-"+id)) || 0;
+// LIKE
+function like(id){
+    let liked = localStorage.getItem("liked-"+id);
+    let count = parseInt(localStorage.getItem("likes-"+id)) || 0;
 
     if(liked){
         count--;
-        localStorage.removeItem("like-"+id);
+        localStorage.removeItem("liked-"+id);
     } else {
         count++;
-        localStorage.setItem("like-"+id, true);
+        localStorage.setItem("liked-"+id,true);
     }
 
-    localStorage.setItem("count-"+id, count);
-    btn.innerText = "❤️ " + count;
+    localStorage.setItem("likes-"+id,count);
+    actualizarLikes();
 }
 
-// COMENTARIOS (guardar)
+// ACTUALIZAR LIKES
+function actualizarLikes(){
+    ["minecraft","gta","fortnite","cod"].forEach(id=>{
+        let count = localStorage.getItem("likes-"+id) || 0;
+        document.getElementById("like-"+id).innerText = "❤️ " + count;
+    });
+}
+
+// COMENTAR
 function comentar(id){
     let input = document.getElementById("input-"+id);
     if(input.value === "") return;
 
-    let comentarios = JSON.parse(localStorage.getItem("coment-"+id)) || [];
-    comentarios.push(input.value);
-
-    localStorage.setItem("coment-"+id, JSON.stringify(comentarios));
+    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
+    data.push(input.value);
+    localStorage.setItem("coment-"+id, JSON.stringify(data));
     input.value = "";
 
     cargarComentarios(id);
 }
 
-// BORRAR COMENTARIO
-function borrarComentario(id, index){
-    let comentarios = JSON.parse(localStorage.getItem("coment-"+id)) || [];
-    comentarios.splice(index,1);
-    localStorage.setItem("coment-"+id, JSON.stringify(comentarios));
+// BORRAR
+function borrar(id,index){
+    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
+    data.splice(index,1);
+    localStorage.setItem("coment-"+id, JSON.stringify(data));
     cargarComentarios(id);
 }
 
-// CARGAR TODO
-function cargar(){
-    ["minecraft","gta","fortnite","cod"].forEach(id=>{
-        
-        // likes
-        let count = localStorage.getItem("count-"+id) || 0;
-        let btn = document.getElementById("like-"+id);
-        btn.innerText = "❤️ " + count;
-
-        // comentarios
-        cargarComentarios(id);
-    });
-}
-
+// CARGAR COMENTARIOS
 function cargarComentarios(id){
     let lista = document.getElementById("comentarios-"+id);
-    let comentarios = JSON.parse(localStorage.getItem("coment-"+id)) || [];
+    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
 
     lista.innerHTML = "";
-    comentarios.forEach((c, i)=>{
+    data.forEach((c,i)=>{
         let li = document.createElement("li");
-        li.innerHTML = c + ' <button class="delete" onclick="borrarComentario(\''+id+'\','+i+')">X</button>';
+        li.innerHTML = c + ' <button class="delete" onclick="borrar(\''+id+'\','+i+')">X</button>';
         lista.appendChild(li);
     });
 }
 
-window.onload = cargar;
+// INICIO
+function iniciar(){
+    actualizarLikes();
+    ["minecraft","gta","fortnite","cod"].forEach(id=>{
+        cargarComentarios(id);
+    });
+}
+
+window.onload = iniciar;
 </script>
 
 </head>
@@ -159,36 +113,31 @@ window.onload = cargar;
 
 <div class="card" onclick="mostrar('minecraft')">
 <img src="https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png">
-<div class="card-content"><h3>Minecraft</h3></div>
+<h3>Minecraft</h3>
 </div>
 
 <div class="card" onclick="mostrar('gta')">
 <img src="https://upload.wikimedia.org/wikipedia/en/a/a5/Grand_Theft_Auto_V.png">
-<div class="card-content"><h3>GTA V</h3></div>
+<h3>GTA V</h3>
 </div>
 
 <div class="card" onclick="mostrar('fortnite')">
 <img src="https://upload.wikimedia.org/wikipedia/en/0/09/Fortnite_cover.jpg">
-<div class="card-content"><h3>Fortnite</h3></div>
+<h3>Fortnite</h3>
 </div>
 
 <div class="card" onclick="mostrar('cod')">
 <img src="https://upload.wikimedia.org/wikipedia/en/6/65/Call_of_Duty_Modern_Warfare_II_Key_Art.jpg">
-<div class="card-content"><h3>Call of Duty</h3></div>
+<h3>Call of Duty</h3>
 </div>
 </section>
 
+<!-- MINECRAFT -->
 <section id="minecraft">
 <h2>Minecraft</h2>
 <img src="https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png" width="100%">
 
-<ul>
-<li>Consigue madera</li>
-<li>Haz herramientas</li>
-<li>Construye refugio</li>
-</ul>
-
-<button id="like-minecraft" class="like" onclick="like(this,'minecraft')">❤️ 0</button>
+<button id="like-minecraft" class="like" onclick="like('minecraft')">❤️ 0</button>
 
 <h3>Comentarios</h3>
 <input id="input-minecraft">
@@ -198,16 +147,12 @@ window.onload = cargar;
 <button onclick="mostrar('inicio')">Volver</button>
 </section>
 
+<!-- GTA -->
 <section id="gta">
 <h2>GTA V</h2>
 <img src="https://upload.wikimedia.org/wikipedia/en/a/a5/Grand_Theft_Auto_V.png" width="100%">
 
-<ul>
-<li>Haz misiones</li>
-<li>Evita policía</li>
-</ul>
-
-<button id="like-gta" class="like" onclick="like(this,'gta')">❤️ 0</button>
+<button id="like-gta" class="like" onclick="like('gta')">❤️ 0</button>
 
 <h3>Comentarios</h3>
 <input id="input-gta">
@@ -217,16 +162,12 @@ window.onload = cargar;
 <button onclick="mostrar('inicio')">Volver</button>
 </section>
 
+<!-- FORTNITE -->
 <section id="fortnite">
 <h2>Fortnite</h2>
 <img src="https://upload.wikimedia.org/wikipedia/en/0/09/Fortnite_cover.jpg" width="100%">
 
-<ul>
-<li>Aterriza lejos</li>
-<li>Consigue armas</li>
-</ul>
-
-<button id="like-fortnite" class="like" onclick="like(this,'fortnite')">❤️ 0</button>
+<button id="like-fortnite" class="like" onclick="like('fortnite')">❤️ 0</button>
 
 <h3>Comentarios</h3>
 <input id="input-fortnite">
@@ -236,16 +177,12 @@ window.onload = cargar;
 <button onclick="mostrar('inicio')">Volver</button>
 </section>
 
+<!-- COD -->
 <section id="cod">
 <h2>Call of Duty</h2>
 <img src="https://upload.wikimedia.org/wikipedia/en/6/65/Call_of_Duty_Modern_Warfare_II_Key_Art.jpg" width="100%">
 
-<ul>
-<li>Apunta bien</li>
-<li>Usa cobertura</li>
-</ul>
-
-<button id="like-cod" class="like" onclick="like(this,'cod')">❤️ 0</button>
+<button id="like-cod" class="like" onclick="like('cod')">❤️ 0</button>
 
 <h3>Comentarios</h3>
 <input id="input-cod">
