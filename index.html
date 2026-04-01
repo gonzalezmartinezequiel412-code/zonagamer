@@ -5,55 +5,68 @@
 <title>Zona Gamer</title>
 
 <style>
-body {margin:0;font-family:sans-serif;background:#0f172a;color:white;}
-header {text-align:center;padding:15px;color:#38bdf8;}
-nav {display:flex;justify-content:center;gap:20px;background:#020617;padding:10px;}
-section {display:none;padding:20px;}
-.active {display:block;}
-button {margin-top:10px;padding:10px;border:none;border-radius:10px;cursor:pointer;}
-input {width:100%;padding:10px;margin-top:10px;}
+body {
+    margin:0;
+    font-family:sans-serif;
+    background:#0f172a;
+    color:white;
+}
+
+header {
+    text-align:center;
+    padding:15px;
+    background:#020617;
+    color:#38bdf8;
+    font-size:22px;
+}
+
+nav {
+    display:flex;
+    justify-content:space-around;
+    background:#020617;
+    padding:10px;
+}
+
+nav button {
+    background:none;
+    border:none;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+section {
+    display:none;
+    padding:20px;
+}
+
+.active {
+    display:block;
+}
+
+.card {
+    background:#020617;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:15px;
+}
+
+input {
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border-radius:10px;
+    border:none;
+}
+
+button {
+    margin-top:10px;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
 </style>
-
-<script>
-function mostrar(id){
-    document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-}
-
-// LIKE simple (toggle)
-function like(btn){
-    if(btn.classList.contains("activeLike")){
-        btn.classList.remove("activeLike");
-        btn.innerText = "❤️ 0";
-    } else {
-        btn.classList.add("activeLike");
-        btn.innerText = "❤️ 1";
-    }
-}
-
-// COMENTAR
-function comentar(id){
-    let input = document.getElementById("input-"+id);
-    let lista = document.getElementById("comentarios-"+id);
-
-    if(input.value !== ""){
-        let li = document.createElement("li");
-
-        let texto = document.createElement("span");
-        texto.textContent = input.value;
-
-        let btn = document.createElement("button");
-        btn.textContent = "X";
-        btn.onclick = function(){ li.remove(); };
-
-        li.appendChild(texto);
-        li.appendChild(btn);
-        lista.appendChild(li);
-
-        input.value = "";
-    }
-}
-</script>
 
 </head>
 <body>
@@ -61,68 +74,76 @@ function comentar(id){
 <header>Zona Gamer 🎮</header>
 
 <nav>
-<a onclick="mostrar('inicio')">Inicio</a>
-<a onclick="mostrar('minecraft')">Minecraft</a>
-<a onclick="mostrar('gta')">GTA V</a>
-<a onclick="mostrar('fortnite')">Fortnite</a>
-<a onclick="mostrar('cod')">Call of Duty</a>
+<button onclick="ir('inicio')">Inicio</button>
+<button onclick="ir('minecraft')">Minecraft</button>
+<button onclick="ir('gta')">GTA V</button>
 </nav>
 
 <section id="inicio" class="active">
-<h2>Elegí un juego</h2>
-<button onclick="mostrar('minecraft')">Minecraft</button>
-<button onclick="mostrar('gta')">GTA V</button>
-<button onclick="mostrar('fortnite')">Fortnite</button>
-<button onclick="mostrar('cod')">Call of Duty</button>
+<h2>Bienvenido</h2>
+<p>Elegí un juego para ver su guía 👇</p>
 </section>
 
 <section id="minecraft">
+<div class="card">
 <h2>Minecraft</h2>
-<img src="https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png" width="100%">
+<p>Guía básica: sobreviví la primera noche consiguiendo madera y carbón.</p>
+
 <button onclick="like(this)">❤️ 0</button>
 
-<input id="input-minecraft">
+<input id="input-minecraft" placeholder="Escribí un comentario">
 <button onclick="comentar('minecraft')">Comentar</button>
-<ul id="comentarios-minecraft"></ul>
 
-<button onclick="mostrar('inicio')">Volver</button>
+<ul id="lista-minecraft"></ul>
+</div>
 </section>
 
 <section id="gta">
+<div class="card">
 <h2>GTA V</h2>
-<img src="https://upload.wikimedia.org/wikipedia/en/a/a5/Grand_Theft_Auto_V.png" width="100%">
+<p>Tip: completá misiones secundarias para ganar dinero rápido.</p>
+
 <button onclick="like(this)">❤️ 0</button>
 
-<input id="input-gta">
+<input id="input-gta" placeholder="Escribí un comentario">
 <button onclick="comentar('gta')">Comentar</button>
-<ul id="comentarios-gta"></ul>
 
-<button onclick="mostrar('inicio')">Volver</button>
+<ul id="lista-gta"></ul>
+</div>
 </section>
 
-<section id="fortnite">
-<h2>Fortnite</h2>
-<img src="https://upload.wikimedia.org/wikipedia/en/0/09/Fortnite_cover.jpg" width="100%">
-<button onclick="like(this)">❤️ 0</button>
+<script>
+function ir(id){
+    let secciones = document.querySelectorAll("section");
+    secciones.forEach(sec => sec.classList.remove("active"));
 
-<input id="input-fortnite">
-<button onclick="comentar('fortnite')">Comentar</button>
-<ul id="comentarios-fortnite"></ul>
+    document.getElementById(id).classList.add("active");
+}
 
-<button onclick="mostrar('inicio')">Volver</button>
-</section>
+// LIKE
+function like(btn){
+    if(btn.dataset.like == "1"){
+        btn.dataset.like = "0";
+        btn.innerText = "❤️ 0";
+    } else {
+        btn.dataset.like = "1";
+        btn.innerText = "❤️ 1";
+    }
+}
 
-<section id="cod">
-<h2>Call of Duty</h2>
-<img src="https://upload.wikimedia.org/wikipedia/en/6/65/Call_of_Duty_Modern_Warfare_II_Key_Art.jpg" width="100%">
-<button onclick="like(this)">❤️ 0</button>
+// COMENTAR
+function comentar(id){
+    let input = document.getElementById("input-"+id);
+    let lista = document.getElementById("lista-"+id);
 
-<input id="input-cod">
-<button onclick="comentar('cod')">Comentar</button>
-<ul id="comentarios-cod"></ul>
-
-<button onclick="mostrar('inicio')">Volver</button>
-</section>
+    if(input.value.trim() !== ""){
+        let li = document.createElement("li");
+        li.textContent = input.value;
+        lista.appendChild(li);
+        input.value = "";
+    }
+}
+</script>
 
 </body>
 </html>
