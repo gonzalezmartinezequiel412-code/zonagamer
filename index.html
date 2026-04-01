@@ -12,7 +12,6 @@ section {display:none;padding:20px;}
 .active {display:block;}
 button {margin-top:10px;padding:10px;border:none;border-radius:10px;cursor:pointer;}
 input {width:100%;padding:10px;margin-top:10px;}
-.delete {background:red;color:white;margin-left:10px;}
 </style>
 
 <script>
@@ -21,69 +20,38 @@ function mostrar(id){
     document.getElementById(id).classList.add("active");
 }
 
-// LIKE SIMPLE
+// LIKE simple (toggle)
 function like(btn){
-    if(btn.classList.contains("activo")){
-        btn.classList.remove("activo");
+    if(btn.classList.contains("activeLike")){
+        btn.classList.remove("activeLike");
         btn.innerText = "❤️ 0";
     } else {
-        btn.classList.add("activo");
+        btn.classList.add("activeLike");
         btn.innerText = "❤️ 1";
     }
 }
 
-// COMENTAR + GUARDAR
+// COMENTAR
 function comentar(id){
     let input = document.getElementById("input-"+id);
-    if(input.value === "") return;
-
-    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
-    data.push(input.value);
-    localStorage.setItem("coment-"+id, JSON.stringify(data));
-
-    input.value = "";
-    cargarComentarios(id);
-}
-
-// BORRAR
-function borrar(id,index){
-    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
-    data.splice(index,1);
-    localStorage.setItem("coment-"+id, JSON.stringify(data));
-    cargarComentarios(id);
-}
-
-// CARGAR COMENTARIOS
-function cargarComentarios(id){
     let lista = document.getElementById("comentarios-"+id);
-    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
 
-    lista.innerHTML = "";
-
-    data.forEach((texto,i)=>{
+    if(input.value !== ""){
         let li = document.createElement("li");
 
-        let span = document.createElement("span");
-        span.textContent = texto;
+        let texto = document.createElement("span");
+        texto.textContent = input.value;
 
         let btn = document.createElement("button");
         btn.textContent = "X";
-        btn.className = "delete";
-        btn.onclick = function(){
-            borrar(id,i);
-        };
+        btn.onclick = function(){ li.remove(); };
 
-        li.appendChild(span);
+        li.appendChild(texto);
         li.appendChild(btn);
         lista.appendChild(li);
-    });
-}
 
-// INICIAR
-window.onload = function(){
-    ["minecraft","gta","fortnite","cod"].forEach(id=>{
-        cargarComentarios(id);
-    });
+        input.value = "";
+    }
 }
 </script>
 
