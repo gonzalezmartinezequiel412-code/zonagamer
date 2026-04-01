@@ -12,6 +12,7 @@ section {display:none;padding:20px;}
 .active {display:block;}
 button {margin-top:10px;padding:10px;border:none;border-radius:10px;cursor:pointer;}
 input {width:100%;padding:10px;margin-top:10px;}
+.delete {background:red;color:white;margin-left:10px;}
 </style>
 
 <script>
@@ -20,39 +21,46 @@ function mostrar(id){
     document.getElementById(id).classList.add("active");
 }
 
-// LIKE simple (toggle)
+// LIKE SIMPLE
 function like(btn){
-    if(btn.classList.contains("activeLike")){
-        btn.classList.remove("activeLike");
+    if(btn.classList.contains("activo")){
+        btn.classList.remove("activo");
         btn.innerText = "❤️ 0";
     } else {
-        btn.classList.add("activeLike");
+        btn.classList.add("activo");
         btn.innerText = "❤️ 1";
     }
 }
 
-// COMENTAR
+// COMENTAR + GUARDAR
 function comentar(id){
     let input = document.getElementById("input-"+id);
-    let lista = document.getElementById("comentarios-"+id);
+    if(input.value === "") return;
 
-    if(input.value !== ""){
-        let comentarios = JSON.parse(localStorage.getItem("coment-"+id)) || [];
-        comentarios.push(input.value);
-        localStorage.setItem("coment-"+id, JSON.stringify(comentarios));
+    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
+    data.push(input.value);
+    localStorage.setItem("coment-"+id, JSON.stringify(data));
 
-        cargarComentarios(id);
-        input.value = "";
-    }
+    input.value = "";
+    cargarComentarios(id);
 }
 
+// BORRAR
+function borrar(id,index){
+    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
+    data.splice(index,1);
+    localStorage.setItem("coment-"+id, JSON.stringify(data));
+    cargarComentarios(id);
+}
+
+// CARGAR COMENTARIOS
 function cargarComentarios(id){
     let lista = document.getElementById("comentarios-"+id);
-    let comentarios = JSON.parse(localStorage.getItem("coment-"+id)) || [];
+    let data = JSON.parse(localStorage.getItem("coment-"+id)) || [];
 
     lista.innerHTML = "";
 
-    comentarios.forEach((texto, index)=>{
+    data.forEach((texto,i)=>{
         let li = document.createElement("li");
 
         let span = document.createElement("span");
@@ -60,8 +68,9 @@ function cargarComentarios(id){
 
         let btn = document.createElement("button");
         btn.textContent = "X";
+        btn.className = "delete";
         btn.onclick = function(){
-            borrarComentario(id, index);
+            borrar(id,i);
         };
 
         li.appendChild(span);
@@ -70,14 +79,8 @@ function cargarComentarios(id){
     });
 }
 
-function borrarComentario(id, index){
-    let comentarios = JSON.parse(localStorage.getItem("coment-"+id)) || [];
-    comentarios.splice(index,1);
-    localStorage.setItem("coment-"+id, JSON.stringify(comentarios));
-
-    cargarComentarios(id);
-}
-}window.onload = function(){
+// INICIAR
+window.onload = function(){
     ["minecraft","gta","fortnite","cod"].forEach(id=>{
         cargarComentarios(id);
     });
