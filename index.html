@@ -37,21 +37,50 @@ function comentar(id){
     let lista = document.getElementById("comentarios-"+id);
 
     if(input.value !== ""){
+        let comentarios = JSON.parse(localStorage.getItem("coment-"+id)) || [];
+        comentarios.push(input.value);
+        localStorage.setItem("coment-"+id, JSON.stringify(comentarios));
+
+        cargarComentarios(id);
+        input.value = "";
+    }
+}
+
+function cargarComentarios(id){
+    let lista = document.getElementById("comentarios-"+id);
+    let comentarios = JSON.parse(localStorage.getItem("coment-"+id)) || [];
+
+    lista.innerHTML = "";
+
+    comentarios.forEach((texto, index)=>{
         let li = document.createElement("li");
 
-        let texto = document.createElement("span");
-        texto.textContent = input.value;
+        let span = document.createElement("span");
+        span.textContent = texto;
 
         let btn = document.createElement("button");
         btn.textContent = "X";
-        btn.onclick = function(){ li.remove(); };
+        btn.onclick = function(){
+            borrarComentario(id, index);
+        };
 
-        li.appendChild(texto);
+        li.appendChild(span);
         li.appendChild(btn);
         lista.appendChild(li);
+    });
+}
 
-        input.value = "";
-    }
+function borrarComentario(id, index){
+    let comentarios = JSON.parse(localStorage.getItem("coment-"+id)) || [];
+    comentarios.splice(index,1);
+    localStorage.setItem("coment-"+id, JSON.stringify(comentarios));
+
+    cargarComentarios(id);
+}
+}window.onload = function(){
+    ["minecraft","gta","fortnite","cod"].forEach(id=>{
+        cargarComentarios(id);
+    });
 }
 </script>
 
